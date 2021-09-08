@@ -1,14 +1,14 @@
 
 var time = 0;
+var columns = 9;
+var rows = 9;
+var mines = 10;
 
 function buildGrid() {
 
     // Fetch grid and clear out old elements.
     var grid = document.getElementById("minefield");
     grid.innerHTML = "";
-
-    var columns = 1;
-    var rows = 1;
 
     // Build DOM Grid
     var tile;
@@ -75,7 +75,19 @@ function setDifficulty() {
     var difficultySelector = document.getElementById("difficulty");
     var difficulty = difficultySelector.selectedIndex;
 
-    //TODO implement me
+    if (difficulty === 0) {
+        columns = 9;
+        rows = 9;
+        mines = 10;
+    } else if (difficulty === 1) {
+        columns = 16;
+        rows = 16;
+        mines = 40;
+    } else if (difficulty === 2) {
+        columns = 30;
+        rows = 16;
+        mines = 99;
+    }
 }
 
 function startTimer() {
