@@ -10,7 +10,7 @@ function buildGrid() {
     var grid = document.getElementById("minefield");
     grid.innerHTML = "";
 
-    document.getElementById("flagCount") = mines;
+    document.getElementById("flagCount").innerHTML = mines;
 
     // Build DOM Grid
     var tile;
