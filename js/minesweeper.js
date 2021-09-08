@@ -2,15 +2,16 @@
 var time = 0;
 var columns = 9;
 var rows = 9;
-var mines = 10;
+var num_of_mines = 10;
+var mines = [];
 
 function buildGrid() {
 
     // Fetch grid and clear out old elements.
     var grid = document.getElementById("minefield");
     grid.innerHTML = "";
-    
-    document.getElementById("flagCount").innerHTML = mines;
+
+    document.getElementById("flagCount").innerHTML = num_of_mines;
 
     // Build DOM Grid
     var tile;
@@ -45,7 +46,7 @@ function createTile(x,y) {
 
 function startGame() {
     buildGrid();
-    buildBombs();
+    mines = buildBombs();
     startTimer();
 }
 
@@ -70,7 +71,9 @@ function handleTileClick(event) {
     }
     // Right Click
     else if (event.which === 3) {
-        //TODO toggle a tile flag
+        this.tile.classList.remove("hidden");
+        this.tile.classList.add("flag");
+        updateFlagCount();
     }
 }
 
@@ -81,22 +84,22 @@ function setDifficulty() {
     if (difficulty === 0) {
         columns = 9;
         rows = 9;
-        mines = 10;
+        num_of_mines = 10;
     } else if (difficulty === 1) {
         columns = 16;
         rows = 16;
-        mines = 40;
+        num_of_mines = 40;
     } else if (difficulty === 2) {
         columns = 30;
         rows = 16;
-        mines = 99;
+        num_of_mines = 99;
     }
 }
 
 function buildBombs() {
     var rows = [];
 
-    for (var i = 0; i < mines; i++) {
+    for (var i = 0; i < num_of_mines; i++) {
         createBomb(rows);
     }
 
