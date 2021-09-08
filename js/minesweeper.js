@@ -10,6 +10,8 @@ function buildGrid() {
     var grid = document.getElementById("minefield");
     grid.innerHTML = "";
 
+    document.getElementById("flagCount") = mines;
+
     // Build DOM Grid
     var tile;
     for (var y = 0; y < rows; y++) {
@@ -46,7 +48,7 @@ function startGame() {
     startTimer();
 }
 
-function smileyDown() {
+function smileyDown() { 
     var smiley = document.getElementById("smiley");
     smiley.classList.add("face_down");
 }
