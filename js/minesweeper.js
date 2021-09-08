@@ -11,8 +11,6 @@ function buildGrid() {
     var grid = document.getElementById("minefield");
     grid.innerHTML = "";
 
-    document.getElementById("flagCount").innerHTML = num_of_mines;
-
     // Build DOM Grid
     var tile;
     for (var y = 0; y < rows; y++) {
@@ -61,19 +59,33 @@ function smileyUp() {
 }
 
 function handleTileClick(event) {
+    var tile = event.target; 
     // Left Click
     if (event.which === 1) {
         //TODO reveal the tile
+        if (!tile.classList.contains("flag")) {
+
+        }
     }
     // Middle Click
     else if (event.which === 2) {
         //TODO try to reveal adjacent tiles
+        if (!tile.classList.contains("flag")) {
+            
+        }
     }
     // Right Click
     else if (event.which === 3) {
-        this.tile.classList.remove("hidden");
-        this.tile.classList.add("flag");
-        updateFlagCount();
+        var tile = event.target; 
+        if (tile.classList.contains("hidden")) {
+            decFlagCount();
+            tile.classList.remove("hidden");
+            tile.classList.add("flag");
+        } else {
+            incFlagCount();
+            tile.classList.add("hidden");
+            tile.classList.remove("flag");
+        }
     }
 }
 
@@ -98,6 +110,7 @@ function setDifficulty() {
 
 function buildBombs() {
     var rows = [];
+    document.getElementById("flagCount").innerHTML = num_of_mines;
 
     for (var i = 0; i < num_of_mines; i++) {
         createBomb(rows);
@@ -142,6 +155,10 @@ function updateTimer() {
     document.getElementById("timer").innerHTML = timeValue;
 }
 
-function updateFlagCount() {
+function decFlagCount() {
     document.getElementById("flagCount").innerHTML--;
+}
+
+function incFlagCount() {
+    document.getElementById("flagCount").innerHTML++;
 }
