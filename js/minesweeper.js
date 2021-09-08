@@ -105,3 +105,7 @@ function onTimerTick() {
 function updateTimer() {
     document.getElementById("timer").innerHTML = timeValue;
 }
+
+function updateFlagCount() {
+    document.getElementById("flagCount").innerHTML--;
+}
