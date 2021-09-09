@@ -122,7 +122,7 @@ function handleTileClick(event) {
         // Left Click
         if (event.which === 1) {
             if (!tile.classList.contains("flag")) {
-                if (tile.classList.contains("mine") && firstClick == 1) {
+                if (tile.classList.contains("Hmine") && firstClick == 1) {
                     tile.classList.remove("hidden");
                     tile.classList.add("mine_hit");
                     gameOver();
@@ -216,8 +216,8 @@ function createBomb() {
 
     var tile = document.getElementById(ncol.toString().concat(" ",nrow.toString()));
 
-    if (!tile.classList.contains("mine")) {
-        tile.classList.add("mine");
+    if (!tile.classList.contains("Hmine")) {
+        tile.classList.add("Hmine");
         return;
     } else {
         createBomb();
@@ -268,7 +268,7 @@ function adjacentBombs(tile) {
             var s = adjCol.toString().concat(" ", adjRow.toString());
             if (adjRow > -1 && adjCol > -1 && adjCol < columns && adjRow < rows) {
                 var adj = document.getElementById(s);
-                if (adj != null && adj.classList.contains("mine")) {
+                if (adj != null && adj.classList.contains("Hmine")) {
                     num_of_adj_bombs++;
                 }
             }
@@ -335,6 +335,18 @@ function gameOver() {
 function gameWon() {
     smileyWin();
     alive = false;
+    var children = document.getElementById("minefield").childNodes;
+    children.forEach(function(item){
+        if(item.classList.contains("flag") && item.classList.contains("Hmine")) {
+            item.classList.remove("flag");
+            item.classList.remove("Hmine");
+            item.classList.remove("mine");
+            item.classList.add("mine_marked");
+        } else if (!item.classList.contains("flag") && item.classList.contains("Hmine")) {
+            item.classList.add("mine");
+            item.classList.remove("hidden");
+        }
+    });
     document.getElementById("finishedTime").innerHTML = timeValue;
     document.getElementById("won").style.display="block";
 }
