@@ -3,10 +3,13 @@ var time = 0;
 var columns = 9;
 var rows = 9;
 var num_of_mines = 10;
-var bombs= [];
 var firstClick = 0;
 var numbers = ["tile_1", "tile_2", "tile_3", "tile_4", "tile_5", "tile_6", "tile_7", "tile_8"];
 var timeVar;
+var tilesClicked = 0;
+var alive;
+var tileGoal;
+var finishedTime;
 
 function buildGrid() {
 
@@ -15,7 +18,7 @@ function buildGrid() {
     grid.innerHTML = "";
 
     document.getElementById("flagCount").innerHTML = num_of_mines;
-
+    tileGoal = (rows*columns)-num_of_mines;
     // Build DOM Grid
     var tile;
     for (var y = 0; y < rows; y++) {
@@ -51,10 +54,20 @@ function createTile(col,row) {
 
 function startGame() {
     buildGrid();
-    bombs = buildBombs();
+    buildBombs();
+    document.getElementById("lost").style.display="none";
+    document.getElementById("won").style.display="none";
     if (firstClick == 1) {
         stopTimer();
     }
+    var smiley = document.getElementById("smiley");
+    if (smiley.classList.contains("face_lose")) {
+        smileyLoseGone();
+    } else if (smiley.classList.contains("face_win")) {
+        smileyWinGone();
+    }
+    tilesClicked = 0;
+    alive = true;
 }
 
 function smileyDown() { 
@@ -83,69 +96,88 @@ function smileyLimboGone() {
 
 function smileyLose() {
     var smiley = document.getElementById("smiley");
+    smiley.classList.remove("face_limbo");
     smiley.classList.add("face_lose");
+}
+
+function smileyLoseGone() {
+    var smiley = document.getElementById("smiley");
+    smiley.classList.remove("face_lose");
 }
 
 function smileyWin() {
     var smiley = document.getElementById("smiley");
+    smiley.classList.remove("face_limbo");
     smiley.classList.add("face_win");
 }
 
+function smileyWinGone() {
+    var smiley = document.getElementById("smiley");
+    smiley.classList.remove("face_win");
+}
+
 function handleTileClick(event) {
-    var tile = event.target; 
-    console.log(event.which);
-    // Left Click
-    if (event.which === 1) {
-        if (!tile.classList.contains("flag")) {
-            if (tile.classList.contains("mine") && firstClick == 1) {
-                tile.classList.remove("hidden");
-                tile.classList.add("mine_hit");
-                
-            } else {
-                var nbombs = adjacentBombs(tile);
-                if (nbombs > 0 && firstClick == 1) {
-                    var str = numbers[nbombs-1];
+    if (alive) {
+        var tile = event.target; 
+        // Left Click
+        if (event.which === 1) {
+            if (!tile.classList.contains("flag")) {
+                if (tile.classList.contains("mine") && firstClick == 1) {
                     tile.classList.remove("hidden");
-                    tile.classList.add("clicked");
-                    tile.classList.add(str);
-                } else if (firstClick == 0 && nbombs==0) {
-                    startTimer();
-                    firstClick = 1;
-                    tile.classList.remove("hidden");
-                    tile.classList.add("clicked");
-                    tile.classList.add("clear");
-                    clickAdjacent(tile);
-                } else if (firstClick == 1){
-                    tile.classList.remove("hidden");
-                    tile.classList.add("clicked");
-                    tile.classList.add("clear");
+                    tile.classList.add("mine_hit");
+                    gameOver();
+                } else if (tile.classList.contains("hidden")){
+                    var nbombs = adjacentBombs(tile);
+                    if (nbombs > 0 && firstClick == 1) {
+                        var str = numbers[nbombs-1];
+                        tile.classList.remove("hidden");
+                        tile.classList.add("clicked");
+                        tile.classList.add(str);
+                        tilesClicked++;
+                    } else if (firstClick == 0 && nbombs==0) {
+                        startTimer();
+                        firstClick = 1;
+                        tile.classList.remove("hidden");
+                        tile.classList.add("clicked");
+                        tile.classList.add("clear");
+                        tilesClicked++;
+                        clickAdjacent(tile);
+                    } else if (firstClick == 1){
+                        tile.classList.remove("hidden");
+                        tile.classList.add("clicked");
+                        tile.classList.add("clear");
+                        tilesClicked++;
+                        clickAdjacent(tile);
+                    }
+                }
+                if (tilesClicked == tileGoal) {
+                    gameWon();
+                }
+            }
+        }
+        // Middle Click
+        else if (event.which === 2) {
+            //TODO try to reveal adjacent tiles
+            if (!tile.classList.contains("flag") && tile.classList.contains("clicked")) {
+                var flagCount = adjacentFlags(tile);
+                var bombCount = adjacentBombs(tile);
+                if (flagCount === bombCount) {
                     clickAdjacent(tile);
                 }
             }
         }
-    }
-    // Middle Click
-    else if (event.which === 2) {
-        //TODO try to reveal adjacent tiles
-        if (!tile.classList.contains("flag") && tile.classList.contains("clicked")) {
-            var flagCount = adjacentFlags(tile);
-            var bombCount = adjacentBombs(tile);
-            if (flagCount === bombCount) {
-                clickAdjacent(tile);
+        // Right Click
+        else if (event.which === 3) {
+            var tile = event.target; 
+            if (tile.classList.contains("hidden") && !tile.classList.contains("clicked")) {
+                decFlagCount();
+                tile.classList.remove("hidden");
+                tile.classList.add("flag");
+            } else if (!tile.classList.contains("clicked")){
+                incFlagCount();
+                tile.classList.add("hidden");
+                tile.classList.remove("flag");
             }
-        }
-    }
-    // Right Click
-    else if (event.which === 3) {
-        var tile = event.target; 
-        if (tile.classList.contains("hidden") && !tile.classList.contains("clicked")) {
-            decFlagCount();
-            tile.classList.remove("hidden");
-            tile.classList.add("flag");
-        } else if (!tile.classList.contains("clicked")){
-            incFlagCount();
-            tile.classList.add("hidden");
-            tile.classList.remove("flag");
         }
     }
 }
@@ -292,3 +324,22 @@ function adjacentFlags(tile) {
     }
     return num_of_adj_flags;
 }
+
+function gameOver() {
+    smileyLose();
+    alive = false;
+    stopTimer();
+    document.getElementById("lost").style.display="block";
+}
+
+function gameWon() {
+    smileyWin();
+    alive = false;
+    document.getElementById("finishedTime").innerHTML = timeValue;
+    document.getElementById("won").style.display="block";
+}
+
+window.addEventListener('load', function() {
+    document.getElementById("lost").style.display="none";
+    document.getElementById("won").style.display="none";
+});
