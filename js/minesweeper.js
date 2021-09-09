@@ -6,6 +6,7 @@ var num_of_mines = 10;
 var bombs= [];
 var firstClick = 0;
 var numbers = ["tile_1", "tile_2", "tile_3", "tile_4", "tile_5", "tile_6", "tile_7", "tile_8"];
+var timeVar;
 
 function buildGrid() {
 
@@ -51,7 +52,9 @@ function createTile(col,row) {
 function startGame() {
     buildGrid();
     bombs = buildBombs();
-    startTimer();
+    if (firstClick == 1) {
+        stopTimer();
+    }
 }
 
 function smileyDown() { 
@@ -62,6 +65,30 @@ function smileyDown() {
 function smileyUp() {
     var smiley = document.getElementById("smiley");
     smiley.classList.remove("face_down");
+}
+
+function smileyLimbo() {
+    if (firstClick == 1) {
+        var smiley = document.getElementById("smiley");
+        smiley.classList.add("face_limbo");
+    }
+}
+
+function smileyLimboGone() {
+    if (firstClick == 1) {
+        var smiley = document.getElementById("smiley");
+        smiley.classList.remove("face_limbo");
+    }
+}
+
+function smileyLose() {
+    var smiley = document.getElementById("smiley");
+    smiley.classList.add("face_lose");
+}
+
+function smileyWin() {
+    var smiley = document.getElementById("smiley");
+    smiley.classList.add("face_win");
 }
 
 function handleTileClick(event) {
@@ -82,6 +109,7 @@ function handleTileClick(event) {
                     tile.classList.add("clicked");
                     tile.classList.add(str);
                 } else if (firstClick == 0 && nbombs==0) {
+                    startTimer();
                     firstClick = 1;
                     tile.classList.remove("hidden");
                     tile.classList.add("clicked");
@@ -166,7 +194,13 @@ function createBomb() {
 
 function startTimer() {
     timeValue = 0;
-    window.setInterval(onTimerTick, 1000);
+    timeVar = window.setInterval(onTimerTick, 1000);
+}
+function stopTimer() {
+    timeValue = null;
+    firstClick = 0;
+    window.clearInterval(timeVar);
+    updateTimer();
 }
 
 function onTimerTick() {
